@@ -31,8 +31,7 @@ with the flow of this service itself later.
 - **S01. Consultation Service**: The center of the Telcenter system, responsible for receiving and responding to customer messages. It manages the entire conversation lifecycle, orchestrates the flow between AI agents and consultant, and stores all interaction data including conversation history, content of messages, and customer reviews.
 - **S04. Customer Identity Service**: This service is responsible for managing customer identities. It handles user registration, authentication, and profile management. 
 - **S07. Partner Management Service**: This service if responsible for managing partner connection. It handles partner addition, update, deletion.
-
-
+- **S14. Partner Metrics Service**: This service is responsible for tracking conversation volume, satisfaction rates, and partner offload rates.
 ## A Note on API Transport Layers
 
 The APIs of the services (including this one
@@ -77,7 +76,7 @@ a `.env.example` file for that.
 
 [A07](../../api_groups/A07.md) (Method)
 
-
+### **S14. Partner Metrics Service**
 
 ## The Flow
 
@@ -393,6 +392,8 @@ S08 Metrics Service aggregates and provides 5 main types of metrics for the Core
 - Increment `invalid_events_counter` metric
 - Alert if invalid_events_counter > 100/hour
 
+---
+
 ## This Service's APIs
 
 This service exposes the following APIs:
@@ -439,6 +440,19 @@ This service exposes the following APIs:
   - Methods used:
     - `get_partners`
   - Usage: Cache partner list for enriching metrics responses with partner names
+
+### Event Publisher APIs (S08 → S14)
+
+**A17a - Metrics Events Publisher**
+[A17](../../api_groups/A17a.md) - Publishes real-time metrics events to S14 Partner Metrics Service (RabbitMQ)
+  - Event Queue: `s08_events_queue`
+
+### Method Responder APIs (S08 ← S14)
+
+**A17b - Metrics Query Methods**
+[A17](../../api_groups/A17b.md) - Responds to method calls from S14 Partner Metrics Service (RabbitMQ)
+  - Request Queue: `s08_s14_requests_queue`
+  - Response Queue: `s08_s14_responses_queue`
 
 ### HTTP API for Core Portal (H21)
 
