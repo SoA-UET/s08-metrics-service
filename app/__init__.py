@@ -4,9 +4,10 @@ service does not need HTTP API
 or WebSocket features.
 """
 
-SERVICE_NAME = "Telcenter Consultation Service" # change this
+SERVICE_NAME = "Telcenter Metrics Service"
 
-
+import dotenv
+dotenv.load_dotenv()
 
 from flask import Flask, url_for
 from flask_cors import CORS
@@ -22,6 +23,8 @@ cors_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
 if cors_origins != "*":
     # Split comma-separated origins and strip whitespace
     cors_origins = [origin.strip() for origin in cors_origins.split(",")]
+
+print(f"CORS allowed origins: {cors_origins}")
 
 socketio = SocketIO(app, cors_allowed_origins=cors_origins)
 
