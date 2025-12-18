@@ -24,14 +24,18 @@ Every downstream service that consumes JWTs issued by the **Identity Service** M
   Response body format:
 
   ```ts
-  {
-    "kid": string, // key ID, UUID-v4
-    "kty": string, // key type, must be one of: "RSA"
-    "alg": string, // signing algorithm, must be one of: "RS256",
-    "public_key": string, // public key to verify JWTs, in PEM format, e.g.
-    // -----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq...\n-----END PUBLIC KEY-----
-    "use": string, // must be "sig"
-  }
+  [
+    {
+      "kid": string, // key ID, UUID-v4
+      "kty": string, // key type, must be one of: "RSA"
+      "alg": string, // signing algorithm, must be one of: "RS256",
+      "public_key": string, // public key to verify JWTs, in PEM format, e.g.
+      // -----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq...\n-----END PUBLIC KEY-----
+      "use": string, // must be "sig"
+    },
+
+    // ... more
+  ]
   ```
 
 * Public keys MUST NOT be hard-coded.
