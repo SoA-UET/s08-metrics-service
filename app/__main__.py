@@ -15,7 +15,6 @@ from app.services.MetricsService import MetricsService
 from app.services.EventConsumerService import EventConsumerService
 from app.services.MethodCallerService import MethodCallerService
 from app.services.S14IntegrationService import S14IntegrationService
-from app.controllers.v1.metrics import create_metrics_controller
 
 
 def initialize_metrics_from_services(metrics_service: MetricsService, method_caller: MethodCallerService):
@@ -128,9 +127,7 @@ def main():
     # 7. Start partner cache refresh worker
     start_partner_cache_refresh_worker(metrics_service, method_caller)
     
-    # 8. Register HTTP controllers
-    metrics_controller = create_metrics_controller(metrics_service)
-    app.register_blueprint(metrics_controller)
+    # 8. HTTP controllers are registered via flask-restx in app/__init__.py
     print("[Startup] HTTP controllers registered")
     
     # Get Flask configuration from environment

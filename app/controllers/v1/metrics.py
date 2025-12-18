@@ -1,31 +1,27 @@
 """
 HTTP Controllers for H21 API - Core Portal Metrics endpoints.
 """
-from flask import Blueprint, request, jsonify
-from ..utils.auth import require_auth
-from ..services.MetricsService import MetricsService
+from flask import request
+from flask_restx import Namespace, Resource
+from ...utils.auth import require_auth
+from ...services.MetricsService import MetricsService
 
-metrics_bp = Blueprint('metrics', __name__, url_prefix='/api/v1')
+api = Namespace('metrics', description='Metrics operations')
+
+# Initialize metrics service
+metrics_service = MetricsService()
 
 
-def create_metrics_controller(metrics_service: MetricsService):
-    """
-    Factory function to create metrics controller with injected service.
-    """
-    
-    @metrics_bp.route('/metrics/users/total', methods=['GET'])
+@api.route('/users/total')
+class TotalUsers(Resource):
+    @api.doc('get_total_users')
     @require_auth
-    def get_total_users():
-        """
-        H21.1: GET /api/v1/metrics/users/total
-        Returns total number of registered customers.
-        """
+    def get(self):
+        """H21.1: Returns total number of registered customers"""
         try:
             from_date = request.args.get('from_date')
             to_date = request.args.get('to_date')
             
-            # Note: Date filtering is not implemented in this version
-            # as metrics are maintained in-memory without date indexing
             total = metrics_service.get_total_customers()
             
             response = {
@@ -38,23 +34,23 @@ def create_metrics_controller(metrics_service: MetricsService):
             if to_date:
                 response["to_date"] = to_date
             
-            return jsonify(response), 200
+            return response, 200
             
         except Exception as e:
             print(f"[H21.1] Error: {e}")
-            return jsonify({
+            return {
                 "status": "error",
                 "error_code": "INTERNAL_ERROR",
-                "message": "An internal server error occurred while retrieving metrics"
-            }), 500
-    
-    @metrics_bp.route('/core/metrics/conversations/summary', methods=['GET'])
+                "message": "An internal server error occurred"
+            }, 500
+
+
+@api.route('/conversations/summary')
+class ConversationsSummary(Resource):
+    @api.doc('get_conversations_summary')
     @require_auth
-    def get_conversations_summary():
-        """
-        H21.2: GET /api/v1/core/metrics/conversations/summary
-        Returns conversation statistics.
-        """
+    def get(self):
+        """H21.2: Returns conversation statistics"""
         try:
             from_date = request.args.get('from_date')
             to_date = request.args.get('to_date')
@@ -71,23 +67,23 @@ def create_metrics_controller(metrics_service: MetricsService):
             if to_date:
                 response["to_date"] = to_date
             
-            return jsonify(response), 200
+            return response, 200
             
         except Exception as e:
             print(f"[H21.2] Error: {e}")
-            return jsonify({
+            return {
                 "status": "error",
                 "error_code": "INTERNAL_ERROR",
-                "message": "An internal server error occurred while retrieving metrics"
-            }), 500
-    
-    @metrics_bp.route('/core/metrics/consultations/satisfaction', methods=['GET'])
+                "message": "An internal server error occurred"
+            }, 500
+
+
+@api.route('/consultations/satisfaction')
+class Satisfaction(Resource):
+    @api.doc('get_satisfaction')
     @require_auth
-    def get_satisfaction():
-        """
-        H21.3: GET /api/v1/core/metrics/consultations/satisfaction
-        Returns customer satisfaction distribution.
-        """
+    def get(self):
+        """H21.3: Returns customer satisfaction distribution"""
         try:
             from_date = request.args.get('from_date')
             to_date = request.args.get('to_date')
@@ -104,23 +100,23 @@ def create_metrics_controller(metrics_service: MetricsService):
             if to_date:
                 response["to_date"] = to_date
             
-            return jsonify(response), 200
+            return response, 200
             
         except Exception as e:
             print(f"[H21.3] Error: {e}")
-            return jsonify({
+            return {
                 "status": "error",
                 "error_code": "INTERNAL_ERROR",
-                "message": "An internal server error occurred while retrieving metrics"
-            }), 500
-    
-    @metrics_bp.route('/core/metrics/consultations/offload-rate', methods=['GET'])
+                "message": "An internal server error occurred"
+            }, 500
+
+
+@api.route('/consultations/offload-rate')
+class OffloadRate(Resource):
+    @api.doc('get_offload_rate')
     @require_auth
-    def get_offload_rate():
-        """
-        H21.4: GET /api/v1/core/metrics/consultations/offload-rate
-        Returns overall offload rate.
-        """
+    def get(self):
+        """H21.4: Returns overall offload rate"""
         try:
             from_date = request.args.get('from_date')
             to_date = request.args.get('to_date')
@@ -137,23 +133,23 @@ def create_metrics_controller(metrics_service: MetricsService):
             if to_date:
                 response["to_date"] = to_date
             
-            return jsonify(response), 200
+            return response, 200
             
         except Exception as e:
             print(f"[H21.4] Error: {e}")
-            return jsonify({
+            return {
                 "status": "error",
                 "error_code": "INTERNAL_ERROR",
-                "message": "An internal server error occurred while retrieving metrics"
-            }), 500
-    
-    @metrics_bp.route('/core/metrics/consultations/offload-rate-by-partner', methods=['GET'])
+                "message": "An internal server error occurred"
+            }, 500
+
+
+@api.route('/consultations/offload-rate-by-partner')
+class OffloadRateByPartner(Resource):
+    @api.doc('get_offload_rate_by_partner')
     @require_auth
-    def get_offload_rate_by_partner():
-        """
-        H21.5: GET /api/v1/core/metrics/consultations/offload-rate-by-partner
-        Returns per-partner offload rate.
-        """
+    def get(self):
+        """H21.5: Returns per-partner offload rate"""
         try:
             from_date = request.args.get('from_date')
             to_date = request.args.get('to_date')
@@ -171,14 +167,12 @@ def create_metrics_controller(metrics_service: MetricsService):
             if to_date:
                 response["to_date"] = to_date
             
-            return jsonify(response), 200
+            return response, 200
             
         except Exception as e:
             print(f"[H21.5] Error: {e}")
-            return jsonify({
+            return {
                 "status": "error",
                 "error_code": "INTERNAL_ERROR",
-                "message": "An internal server error occurred while retrieving metrics"
-            }), 500
-    
-    return metrics_bp
+                "message": "An internal server error occurred"
+            }, 500
