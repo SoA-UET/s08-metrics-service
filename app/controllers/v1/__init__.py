@@ -3,7 +3,7 @@
 from flask import Blueprint
 from flask_restx import Api
 
-v1 = Blueprint("v1", __name__, url_prefix="/api/v1")
+v1 = Blueprint("v1", __name__, url_prefix="/api/v1/core")
 
 _api = Api(
     v1,
