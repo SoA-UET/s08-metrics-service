@@ -95,38 +95,41 @@ def main():
     print("=" * 60)
     
     # Initialize Flask app
-    app = Flask(__name__)
+    from . import app
+
+    def initialize_services():
+        # Initialize services
+        print("[Startup] Initializing services...")
+        
+        # 1. MessageQueue Service
+        mq_service = MessageQueueService()
+        print("[Startup] MessageQueueService initialized")
+        
+        # 2. Metrics Service (in-memory metrics storage)
+        metrics_service = MetricsService()
+        print("[Startup] MetricsService initialized")
+        
+        # 3. Method Caller Service (call S01, S04, S07)
+        method_caller = MethodCallerService(mq_service)
+        print("[Startup] MethodCallerService initialized")
+        
+        # 4. Initialize metrics from peer services
+        initialize_metrics_from_services(metrics_service, method_caller)
+        
+        # 5. Event Consumer Service (consume events from S01, S04)
+        event_consumer = EventConsumerService(mq_service, metrics_service)
+        event_consumer.start()
+        print("[Startup] EventConsumerService started")
+        
+        # 6. S14 Integration Service (publish events to S14, respond to S14 method calls)
+        s14_integration = S14IntegrationService(mq_service, metrics_service)
+        print("[Startup] S14IntegrationService initialized")
+        
+        # 7. Start partner cache refresh worker
+        start_partner_cache_refresh_worker(metrics_service, method_caller)
     
-    # Initialize services
-    print("[Startup] Initializing services...")
-    
-    # 1. MessageQueue Service
-    mq_service = MessageQueueService()
-    print("[Startup] MessageQueueService initialized")
-    
-    # 2. Metrics Service (in-memory metrics storage)
-    metrics_service = MetricsService()
-    print("[Startup] MetricsService initialized")
-    
-    # 3. Method Caller Service (call S01, S04, S07)
-    method_caller = MethodCallerService(mq_service)
-    print("[Startup] MethodCallerService initialized")
-    
-    # 4. Initialize metrics from peer services
-    initialize_metrics_from_services(metrics_service, method_caller)
-    
-    # 5. Event Consumer Service (consume events from S01, S04)
-    event_consumer = EventConsumerService(mq_service, metrics_service)
-    event_consumer.start()
-    print("[Startup] EventConsumerService started")
-    
-    # 6. S14 Integration Service (publish events to S14, respond to S14 method calls)
-    s14_integration = S14IntegrationService(mq_service, metrics_service)
-    print("[Startup] S14IntegrationService initialized")
-    
-    # 7. Start partner cache refresh worker
-    start_partner_cache_refresh_worker(metrics_service, method_caller)
-    
+    threading.Thread(target=initialize_services, daemon=True, name="ServiceInitializer").start()
+        
     # 8. HTTP controllers are registered via flask-restx in app/__init__.py
     print("[Startup] HTTP controllers registered")
     

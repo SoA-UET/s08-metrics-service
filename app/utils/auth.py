@@ -151,11 +151,11 @@ def require_auth(f):
         auth_header = request.headers.get("Authorization", "")
         
         if not auth_header.startswith("Bearer "):
-            return jsonify({
+            return {
                 "status": "error",
                 "error_code": "UNAUTHORIZED",
                 "message": "Authentication token is invalid or expired"
-            }), 401
+            }, 401
         
         token = auth_header[7:]  # Remove "Bearer " prefix
         
@@ -169,10 +169,10 @@ def require_auth(f):
             return f(*args, **kwargs)
         except Exception as e:
             print(f"[Auth] JWT verification failed: {e}")
-            return jsonify({
+            return {
                 "status": "error",
                 "error_code": "UNAUTHORIZED",
                 "message": "Authentication token is invalid or expired"
-            }), 401
+            }, 401
     
     return decorated_function

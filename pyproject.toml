@@ -13,4 +13,5 @@ dependencies = [
     "cryptography>=41.0.0",
     "requests>=2.31.0",
     "pymongo>=4.15.5",
+    "bson>=0.5.10",
 ]

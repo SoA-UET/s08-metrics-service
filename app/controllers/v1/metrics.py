@@ -5,6 +5,7 @@ from flask import request
 from flask_restx import Namespace, Resource
 from ...utils.auth import require_auth
 from ...services.MetricsService import MetricsService
+from ...utils.db import serialize_mongo_doc
 
 api = Namespace('metrics', description='Metrics operations')
 
@@ -34,7 +35,7 @@ class TotalUsers(Resource):
             if to_date:
                 response["to_date"] = to_date
             
-            return response, 200
+            return serialize_mongo_doc(response), 200
             
         except Exception as e:
             print(f"[H21.1] Error: {e}")
@@ -67,7 +68,7 @@ class ConversationsSummary(Resource):
             if to_date:
                 response["to_date"] = to_date
             
-            return response, 200
+            return serialize_mongo_doc(response), 200
             
         except Exception as e:
             print(f"[H21.2] Error: {e}")
@@ -100,7 +101,7 @@ class Satisfaction(Resource):
             if to_date:
                 response["to_date"] = to_date
             
-            return response, 200
+            return serialize_mongo_doc(response), 200
             
         except Exception as e:
             print(f"[H21.3] Error: {e}")
@@ -133,7 +134,7 @@ class OffloadRate(Resource):
             if to_date:
                 response["to_date"] = to_date
             
-            return response, 200
+            return serialize_mongo_doc(response), 200
             
         except Exception as e:
             print(f"[H21.4] Error: {e}")
@@ -167,7 +168,7 @@ class OffloadRateByPartner(Resource):
             if to_date:
                 response["to_date"] = to_date
             
-            return response, 200
+            return serialize_mongo_doc(response), 200
             
         except Exception as e:
             print(f"[H21.5] Error: {e}")
