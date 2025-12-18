@@ -5,7 +5,7 @@ from flask import request, jsonify
 import os
 import time
 import threading
-from typing import Optional, Dict
+from typing import Optional, List, Dict
 
 class JWTVerifier:
     """
@@ -16,7 +16,7 @@ class JWTVerifier:
     def __init__(self):
         self.identity_service_url = os.getenv("IDENTITY_SERVICE_URL", "")
         self.jwks_ttl_minutes = int(os.getenv("JWKS_TTL_IN_MINUTES", "10"))
-        self.jwks_cache: Optional[Dict] = None
+        self.jwks_cache: Optional[List[Dict]] = None
         self.jwks_cache_time: float = 0
         self.cache_lock = threading.Lock()
         
@@ -60,7 +60,7 @@ class JWTVerifier:
             if cache_age_minutes >= self.jwks_ttl_minutes:
                 self._fetch_jwks()
     
-    def _get_cached_jwks(self) -> Optional[Dict]:
+    def _get_cached_jwks(self) -> Optional[List[Dict]]:
         """Get cached JWKS in a thread-safe manner."""
         with self.cache_lock:
             return self.jwks_cache
@@ -95,10 +95,17 @@ class JWTVerifier:
         if not jwks:
             raise Exception("JWKS not available")
         
-        if jwks.get("kid") != kid:
+        # Find the key with matching kid in the JWKS array
+        matching_key = None
+        for key_obj in jwks:
+            if key_obj.get("kid") == kid:
+                matching_key = key_obj
+                break
+        
+        if not matching_key:
             raise Exception("Unknown kid")
         
-        public_key_pem = jwks.get("public_key")
+        public_key_pem = matching_key.get("public_key")
         if not public_key_pem:
             raise Exception("Public key not found in JWKS")
         
