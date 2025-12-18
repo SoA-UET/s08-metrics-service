@@ -2,7 +2,14 @@ import json
 import pika
 from typing import Callable
 import os
-from ..utils.db import serialize_mongo_doc
+
+
+def serialize_mongo_doc(obj):
+    """
+    Serialize MongoDB documents (handle ObjectId, datetime, etc.)
+    For S08, we don't use MongoDB, so this is a simple pass-through.
+    """
+    return obj
 
 class MessageQueueService:
     """
